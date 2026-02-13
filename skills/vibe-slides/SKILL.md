@@ -1,6 +1,6 @@
 ---
 name: vibe-slides
-description: Create presentation decks and export to PDF/PPTX/PNG using the Vibe Slides API. Use for any slide deck, presentation, or PowerPoint generation request. Triggers on "make a deck", "create a presentation", "build slides", "make a PowerPoint", "generate a pptx", or any presentation creation task. Also supports branded decks using company themes, headshot/image attachments, and one-page profile summaries. Triggers on "create a profile deck", "make a one-pager for", "LinkedIn summary deck", or similar.
+description: Create presentation decks and export to PDF/PPTX/PNG using the Vibe Slides API. Use for any slide deck, presentation, or PowerPoint generation request. Triggers on "make a deck", "create a presentation", "build slides", "make a PowerPoint", "generate a pptx", or any presentation creation task.
 ---
 
 # Vibe Slides — Presentation Generation
@@ -34,7 +34,7 @@ Output: `FILE: /path/to/deck.pdf` on stdout, progress on stderr.
 
 ---
 
-## Script 1: General Deck Creation
+## Usage
 
 ```
 node skills/vibe-slides/scripts/vibe-slides.mjs "your prompt" [options]
@@ -61,57 +61,9 @@ node skills/vibe-slides/scripts/vibe-slides.mjs "your prompt" [options]
 
 ---
 
-## Script 2: LinkedIn Profile One-Pager
-
-Creates a branded one-page profile deck from structured profile data piped via stdin.
-
-```
-cat profile.json | node skills/vibe-slides/scripts/linkedin-deck.mjs "Person Name" [options]
-```
-
-### Options
-
-| Flag | Effect |
-|------|--------|
-| `--url <url>` | LinkedIn profile URL (informational) |
-| `--company <url>` | Override company URL for theme |
-| `--no-theme` | Skip theme creation |
-| `--no-photo` | Skip headshot attachment |
-| `--style <desc>` | Style description (default: "professional, modern, and visually striking") |
-| `--format <fmt>` | `pdf` (default), `pptx`, or `png` |
-| `--out <dir>` | Output directory (default: cwd) |
-| `--filename <name>` | Output filename without extension |
-
-### Stdin JSON Schema
-
-```json
-{
-  "name": "Jane Smith",
-  "headline": "VP Engineering at Acme",
-  "location": "Melbourne, Australia",
-  "followers": "5,200",
-  "about": "Building great teams...",
-  "experience": "1. Acme — VP Eng (2023-Present)\n2. BigCo — Director (2019-2023)",
-  "education": "MIT — Computer Science",
-  "skills": "Leadership, Distributed Systems, ML",
-  "recommendations": "Jane is an exceptional leader...",
-  "companyName": "Acme",
-  "companyUrl": "https://acme.com",
-  "photoPath": "/absolute/path/to/headshot.jpg"
-}
-```
-
-The script auto-creates a branded theme from `companyUrl`, uploads the headshot as an attachment, and generates a visually rich one-page profile card.
-
-**Without companyUrl:** deck generates unbranded (no theme colors). Always try to find the company website.
-
-**Without photoPath:** layout adjusts to use full slide space (no placeholder silhouette).
-
----
-
 ## API Reference
 
-The scripts wrap these endpoints. Use directly only if the scripts don't cover your use case.
+The script wraps these endpoints. Use directly only if the script doesn't cover your use case.
 
 **Base URL:** `https://api.vibeslides.app`
 **Auth:** `Authorization: Bearer <VIBE_API_KEY>`
@@ -130,7 +82,7 @@ Poll `status` until `ready`. Theme creation takes ~2–5s. **Check existing them
 
 ### Attachments
 
-Upload images (headshots, logos, diagrams) to include in decks.
+Upload images (logos, diagrams) to include in decks.
 
 ```
 POST /v1/attachments  (multipart/form-data, field: "file")
@@ -177,8 +129,7 @@ Poll until `download_url` appears. PNG format returns a zip of one PNG per slide
 - "Use icons and visual elements, not just bullet points"
 
 ### With attachments
-- "Include the attached headshot prominently on the first slide"
-- "Use the attached logo in the header of every slide"
+- "Include the attached logo in the header of every slide"
 - Reference attached images explicitly so the deck AI knows to use them
 
 ### Example: complete prompt
@@ -205,6 +156,4 @@ Audience: investors at a demo day.
 ## Notes
 
 - Decks stay accessible at `https://vibeslides.app/d/<id>` after export
-- The `linkedin-deck.mjs` script requires `adm-zip` and `sharp` (installed in `skills/vibe-slides/node_modules/`)
-- PNG export returns a zip; the script auto-extracts the first slide
-- For multi-slide PNG export, use the API directly and extract all entries from the zip
+- PNG export returns a zip of one PNG per slide
